@@ -21,7 +21,10 @@ template(name="attachmentDeletePopup")
 template(name="attachmentsGalery")
   .attachments-galery
     each attachments
-      a.attachment-item.swipebox(href="{{url}}" title="{{name}}")
+      a.attachment-item(
+        class="{{#if isImage}}swipebox{{/if}}"
+        href="{{#if isImage}}{{url}}{{/if}}"
+        title="{{#if isImage}}{{name}}{{/if}}")
         .attachment-thumbnail
           if isUploaded
             if isImage
