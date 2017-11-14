@@ -1,7 +1,9 @@
+import { PDFJS } from 'meteor/pascoual:pdfjs';
+
 Template.attachmentsGalery.events({
   'click .js-add-attachment': Popup.open('cardAttachments'),
   'click .js-confirm-delete': Popup.afterConfirm('attachmentDelete',
-    function() {
+    function () {
       Attachments.remove(this._id);
       Popup.close();
     }
@@ -16,6 +18,33 @@ Template.attachmentsGalery.events({
   },
   'click .js-remove-cover'() {
     Cards.findOne(this.cardId).unsetCover();
+  },
+  'click .attachment-item'(event) {
+    event.preventDefault();
+    const { currentTarget: { innerText: attachmentExtension } } = event;
+    if (attachmentExtension.toLowerCase().includes('pdf')) {
+      const pdfUrl = $(event.target).closest('a')[0].href;
+      PDFJS.workerSrc = '/packages/pascoual_pdfjs/build/pdf.worker.js';
+
+      // Create PDF
+      PDFJS.getDocument(pdfUrl).then(function getPdf(pdf) {
+        // Fetch the first page
+        pdf.getPage(1).then(function getPageHelloWorld(page) {
+          const scale = 1;
+          const viewport = page.getViewport(scale);
+
+          // Prepare canvas using PDF page dimensions
+          const canvas = $('.pdf-preview')[0];
+          const canvasContext = canvas.getContext('2d');
+          canvas.height = viewport.height;
+          canvas.width = viewport.width;
+
+          // Render PDF page into canvas context
+          page.render({ canvasContext, viewport });
+        });
+      });
+
+    }
   },
   'click .js-preview-image'(evt) {
     Popup.open('previewAttachedImage').call(this, evt);
@@ -33,8 +62,8 @@ Template.attachmentsGalery.events({
         $('div.pop-over').css({
           width: (w + 20),
           position: 'absolute',
-          left: (window.innerWidth - w)/2,
-          top: (window.innerHeight - h)/2,
+          left: (window.innerWidth - w) / 2,
+          top: (window.innerHeight - h) / 2,
         });
       }
     };
@@ -47,7 +76,7 @@ Template.attachmentsGalery.events({
 });
 
 Template.previewAttachedImagePopup.events({
-  'click .js-large-image-clicked'(){
+  'click .js-large-image-clicked'() {
     Popup.close();
   },
 });
@@ -109,7 +138,7 @@ Template.previewClipboardImagePopup.events({
       file.userId = Meteor.userId();
       Attachments.insert(file);
       pastedResults = null;
-      $(document.body).pasteImageReader(() => {});
+      $(document.body).pasteImageReader(() => { });
       Popup.close();
     }
   },
