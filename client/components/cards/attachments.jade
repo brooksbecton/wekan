@@ -23,7 +23,7 @@ template(name="attachmentsGalery")
     each attachments
       a.attachment-item(
         class="{{#if isImage}}swipebox{{/if}}"
-        href="{{#if isImage}}{{url}}{{/if}}"
+        href="{{url}}"
         title="{{#if isImage}}{{name}}{{/if}}")
         .attachment-thumbnail
           if isUploaded
@@ -50,7 +50,7 @@ template(name="attachmentsGalery")
               a.js-confirm-delete
                 i.fa.fa-close
                 | {{_ 'delete'}}
-
+  canvas.pdf-preview
     if currentUser.isBoardMember
       li.attachment-item.add-attachment
         a.js-add-attachment {{_ 'add-attachment' }}
